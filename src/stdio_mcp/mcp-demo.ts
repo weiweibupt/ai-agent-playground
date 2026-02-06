@@ -1,4 +1,4 @@
-import { McpClient } from "./McpClient.js";
+import { McpClient } from "./mcp-client.js";
 import { writeFile } from "fs/promises";
 import { join } from "path";
 
@@ -11,7 +11,7 @@ async function mcpDemo() {
   
   // 创建客户端，连接到我们的简单服务器
   // 注意：您需要先在另一个终端运行服务器
-  const client = new McpClient("tsx", ["src/stdio_mcp/McpServer.ts"]);
+  const client = new McpClient("tsx", ["src/stdio_mcp/mcp-server.ts"]);
   // const client = new McpClient("uvx", ["mcp-server-fetch"]);
 
   try {

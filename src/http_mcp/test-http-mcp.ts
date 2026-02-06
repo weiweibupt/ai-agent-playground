@@ -1,4 +1,4 @@
-import { Agent } from "../Agent.js";
+import { Agent } from "../agent.js";
 
 /**
  * 测试 HTTP MCP 客户端
@@ -60,7 +60,7 @@ async function main() {
         name: "calculator",
         type: "stdio",
         command: "tsx",
-        args: ["src/stdio_mcp/McpServer.ts"],
+        args: ["src/stdio_mcp/mcp-server.ts"],
       },
       // HTTP 类型：HTTP MCP 服务器
       {

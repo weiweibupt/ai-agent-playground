@@ -1,4 +1,4 @@
-import { Agent } from "./Agent.js";
+import { Agent } from "./agent.js";
 import * as readline from "readline/promises";
 
 /**
@@ -19,7 +19,7 @@ async function main() {
         name: "calculator",
         type: "stdio",
         command: "tsx",
-        args: ["src/McpServer.ts"],
+        args: ["src/stdio_mcp/mcp-server.ts"],
       },
       // HTTP 类型的 MCP 服务器示例
       // {
@@ -106,7 +106,7 @@ async function demo() {
         name: "my-mcp-server-tools",
         type: "stdio",
         command: "tsx",
-        args: ["src/stdio_mcp/McpServer.ts"],
+        args: ["src/stdio_mcp/mcp-server.ts"],
       },
       
       // 可以添加更多 MCP 服务器

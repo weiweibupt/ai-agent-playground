@@ -9,9 +9,9 @@
 
 
 
-import { ChatOpenAI } from "./ChatOpenAI.js";
-import { McpClient } from "./stdio_mcp/McpClient.js";
-import { McpHttpClient } from "./http_mcp/McpHttpClient.js";
+import { ChatOpenAI } from "./chat-open-ai.js";
+import { McpClient } from "./stdio_mcp/mcp-client.js";
+import { McpHttpClient } from "./http_mcp/mcp-http-client.js";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import type { ChatCompletionTool } from "openai/resources/chat/completions";
 

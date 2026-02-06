@@ -10,7 +10,7 @@
     "dev": "tsx src/index.ts",
     "test:stdio-mcp": "tsx src/stdio_mcp/mcp-demo.ts",
     "test:http-mcp": "tsx src/http_mcp/test-http-mcp.ts",
-    "mcp:http-server": "tsx src/http_mcp/McpHttpServer.ts"
+    "mcp:http-server": "tsx src/http_mcp/mcp-http-server.ts"
   },
   "keywords": [],
   "author": "",
