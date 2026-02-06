@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "my-calculator": {
+      "command": "tsx",
+      "args": ["/Users/weiwei/myCode/ts-node-esm-template/src/stdio_mcp/McpServer.ts"]
+    }
+  }
+}

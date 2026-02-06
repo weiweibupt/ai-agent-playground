@@ -7,7 +7,10 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "test:stdio-mcp": "tsx src/stdio_mcp/mcp-demo.ts",
+    "test:http-mcp": "tsx src/http_mcp/test-http-mcp.ts",
+    "mcp:http-server": "tsx src/http_mcp/McpHttpServer.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,5 +26,11 @@
     "onlyBuiltDependencies": [
       "esbuild"
     ]
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "chalk": "^5.6.2",
+    "dotenv": "^17.2.3",
+    "openai": "^6.17.0"
   }
 }
