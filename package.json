@@ -8,9 +8,10 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
-    "test:stdio-mcp": "tsx src/stdio_mcp/mcp-demo.ts",
+    "mcp:http-server": "tsx src/http_mcp/mcp-http-server.ts",
+    "test:stdio-mcp": "tsx src/stdio_mcp/test-stdio-mcp.ts",
     "test:http-mcp": "tsx src/http_mcp/test-http-mcp.ts",
-    "mcp:http-server": "tsx src/http_mcp/mcp-http-server.ts"
+    "test:rag": "tsx src/test/test-rag.ts"
   },
   "keywords": [],
   "author": "",

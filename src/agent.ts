@@ -12,6 +12,7 @@
 import { ChatOpenAI } from "./chat-open-ai.js";
 import { McpClient } from "./stdio_mcp/mcp-client.js";
 import { McpHttpClient } from "./http_mcp/mcp-http-client.js";
+import { RAGRetriever } from "./rag/index.js";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import type { ChatCompletionTool } from "openai/resources/chat/completions";
 
@@ -47,6 +48,9 @@ export interface AgentOptions {
     systemPrompt?: string;
     mcpServers?: McpServerConfig[];
     maxIterations?: number; // 最大循环次数，防止无限循环
+    ragRetriever?: RAGRetriever; // RAG 检索器（可选）
+    ragTopK?: number; // RAG 检索文档数量
+    enableRAG?: boolean; // 是否启用 RAG
 }
 
 
@@ -54,6 +58,9 @@ export class Agent {
     private chatModel: ChatOpenAI;
     private mcpClients: Map<string, McpClient | McpHttpClient> = new Map();
     private maxIterations: number;
+    private ragRetriever?: RAGRetriever;
+    private ragTopK: number;
+    private enableRAG: boolean;
 
     /**
      * 私有构造函数 - 只能通过 Agent.create() 调用
@@ -62,11 +69,17 @@ export class Agent {
     private constructor(
         chatModel: ChatOpenAI,
         mcpClients: Map<string, McpClient | McpHttpClient>,
-        maxIterations: number
+        maxIterations: number,
+        ragRetriever?: RAGRetriever,
+        ragTopK: number = 3,
+        enableRAG: boolean = false
     ) {
         this.chatModel = chatModel;
         this.mcpClients = mcpClients;
         this.maxIterations = maxIterations;
+        this.ragRetriever = ragRetriever;
+        this.ragTopK = ragTopK;
+        this.enableRAG = enableRAG && !!ragRetriever;
     }
 
     /**
@@ -94,7 +107,14 @@ export class Agent {
 
         console.log(`[Agent] [create] 3/6 实例化 Agent, mcpClients:::`);
         // 3. 返回完整初始化的 Agent
-        return new Agent(chatModel, mcpClients, maxIterations);
+        return new Agent(
+            chatModel,
+            mcpClients,
+            maxIterations,
+            options.ragRetriever,
+            options.ragTopK ?? 3,
+            options.enableRAG ?? false
+        );
 
     }
 
@@ -200,13 +220,36 @@ export class Agent {
         let iteration = 0;
         let lastAssistantMessage = "";
 
+        // RAG 增强：在第一次调用前检索相关文档
+        let enhancedMessage = userMessage;
+        if (this.enableRAG && this.ragRetriever) {
+            console.log(`[Agent] [chat] 🔍 启用 RAG，正在检索相关文档...`);
+            const context = await this.ragRetriever.retrieveContext(
+                userMessage,
+                this.ragTopK
+            );
+
+            if (context) {
+                enhancedMessage = `参考以下文档回答问题：
+
+${context}
+
+---
+
+用户问题: ${userMessage}`;
+                console.log(`[Agent] [chat] ✅ RAG 上下文已添加`);
+            } else {
+                console.log(`[Agent] [chat] ⚠️ 未找到相关文档，使用原始问题`);
+            }
+        }
+
         // 循环处理，直到没有工具调用或达到最大迭代次数
         while (iteration < this.maxIterations) {
             iteration++;
 
-            // 调用大模型（第一次传 userMessage，后续传 undefined 继续上下文）
+            // 调用大模型（第一次传 enhancedMessage，后续传 undefined 继续上下文）
             const response = await this.chatModel.chat(
-                iteration === 1 ? userMessage : undefined
+                iteration === 1 ? enhancedMessage : undefined
             );
 
             // 检查是否有工具调用
@@ -322,6 +365,28 @@ export class Agent {
      */
     clearMessages(): void {
         this.chatModel.clearMessages();
+    }
+
+    /**
+     * 获取 RAG 检索器
+     */
+    getRAGRetriever(): RAGRetriever | undefined {
+        return this.ragRetriever;
+    }
+
+    /**
+     * 设置 RAG 检索器
+     */
+    setRAGRetriever(retriever: RAGRetriever): void {
+        this.ragRetriever = retriever;
+        this.enableRAG = true;
+    }
+
+    /**
+     * 启用/禁用 RAG
+     */
+    setEnableRAG(enable: boolean): void {
+        this.enableRAG = enable && !!this.ragRetriever;
     }
 
     /**
