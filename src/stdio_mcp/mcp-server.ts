@@ -39,7 +39,7 @@ export class SimpleServer {
         tools: [
           {
             name: "calculator",
-            description: "执行基本的数学计算",
+            description: "数学计算工具，支持加减乘除运算",
             inputSchema: {
               type: "object",
               properties: {

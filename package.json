@@ -11,7 +11,10 @@
     "mcp:http-server": "tsx src/http_mcp/mcp-http-server.ts",
     "test:stdio-mcp": "tsx src/stdio_mcp/test-stdio-mcp.ts",
     "test:http-mcp": "tsx src/http_mcp/test-http-mcp.ts",
-    "test:rag": "tsx src/test/test-rag.ts"
+    "test:rag": "tsx src/test/test-rag.ts",
+    "test:skills": "tsx src/test/test-skills.ts",
+    "test:skills-unit": "tsx src/test/test-skills-unit.ts",
+    "test:skills-complete": "tsx src/test/test-skills-complete.ts"
   },
   "keywords": [],
   "author": "",

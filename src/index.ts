@@ -2,6 +2,9 @@ import { Agent } from "./agent.js";
 import * as readline from "readline/promises";
 import { RAGRetriever } from "./rag/index.js";
 
+import path from "path";
+import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 /**
  * 主函数：演示 Agent 的使用
  */
@@ -198,16 +201,21 @@ MCP 支持两种传输方式：Stdio（标准输入输出）和 HTTP（Server-Se
   const stats = ragRetriever.getStats();
   console.log(`✅ 知识库初始化完成，共 ${stats.documentCount} 个文档块\n`);
 
+
+  const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+  const skillsDir = path.join(__dirname, "../SKILL");
   // 2. 创建集成了 RAG 的 Agent
   console.log("🤖 步骤 2: 创建集成 RAG 的 Agent...");
   const agent = await Agent.create({
     model: "qwen-turbo",
-    systemPrompt: `你是一个技术专家助手，可以基于知识库回答问题。
-当回答问题时：
-1. 优先使用提供的参考文档中的信息
-2. 如果参考文档中没有相关信息，可以使用你的通用知识
-3. 明确指出信息来源（来自文档还是通用知识）
-4. 用中文回答，语言简洁清晰`,
+//     systemPrompt: `你是一个技术专家助手，可以基于知识库回答问题。
+// 当回答问题时：
+// 1. 优先使用提供的参考文档中的信息
+// 2. 如果参考文档中没有相关信息，可以使用你的通用知识
+// 3. 明确指出信息来源（来自文档还是通用知识）
+// 4. 用中文回答，语言简洁清晰`,
+systemPrompt: `你是一个技术专家助手，可以基于skills回答问题`,
     maxIterations: 10,
     mcpServers: [
       {
@@ -217,9 +225,11 @@ MCP 支持两种传输方式：Stdio（标准输入输出）和 HTTP（Server-Se
         args: ["src/stdio_mcp/mcp-server.ts"],
       },
     ],
-    ragRetriever: ragRetriever,
-    enableRAG: true,
-    ragTopK: 3,
+    // ragRetriever: ragRetriever,
+    // enableRAG: true,
+    // ragTopK: 3,
+    skillsDirectory: skillsDir,
+    enableSkills: true,
   });
 
   console.log("✅ Agent 创建完成\n");
@@ -267,8 +277,13 @@ MCP 支持两种传输方式：Stdio（标准输入输出）和 HTTP（Server-Se
   console.log("📋 测试知识库外问题");
   console.log("─".repeat(60));
   
-  const outsideAnswer = await agent.chat("Python 和 JavaScript 有什么区别？");
-  console.log(`\n🤖 Agent 回答:\n${outsideAnswer}`);
+  
+  const outsideAnswer2 = await agent.chat("处理计算流程：11+22");
+  console.log(`\n🤖 Agent 回答:\n${outsideAnswer2}`);
+
+  // const outsideAnswer = await agent.chat("为什么计算11+22时，你没有通过read_skill读取calculator的技能指南,而是直接调用了calculator工具？system prompt里说明了1. **主动调用**: 当你判断用户的请求与某个 skill 相关时，应主动调用 `read_skill` 工具读取该 skill 的完整指南\n'，还标注了重要，你为什么没有遵守？我修改什么才能让你能够去主动遵守可能相关时主动调用read_skill工具？");
+  // console.log(`\n🤖 Agent 回答:\n${outsideAnswer}`);
+const outsideAnswer = await agent.chat("为什么计算11+22时，你没有通过read_skill读取calculator的技能指南,而是直接调用了calculator工具？");
 
   // 打印统计信息
   console.log(`\n\n${"=".repeat(60)}`);
@@ -279,22 +294,35 @@ MCP 支持两种传输方式：Stdio（标准输入输出）和 HTTP（Server-Se
   console.log(`RAG 状态: ${agent.getRAGRetriever() ? '已启用' : '未启用'}`);
 
 console.log("******************************************************")
-console.log(agent.getMessages())
+const messages = agent.getMessages();
+
+if (messages[5]?.content && typeof messages[5].content === 'string' && messages[5].content.indexOf('calculator-assist') > -1) {
+  res.push(true);
+} else {
+  res.push(false);
+}
+console.log(res)
   // 清理资源
   agent.clearMessages();
   await agent.disconnect();
   
-  console.log("\n✅ 演示完成！");
-  console.log("\n💡 总结:");
-  console.log("   ✓ Agent 成功集成了 RAG 能力");
-  console.log("   ✓ 可以基于知识库准确回答问题");
-  console.log("   ✓ 支持 RAG + 工具调用的混合使用");
-  console.log("   ✓ 对知识库外的问题也能合理回答");
+  // console.log("\n✅ 演示完成！");
+  // console.log("\n💡 总结:");
+  // console.log("   ✓ Agent 成功集成了 RAG 能力");
+  // console.log("   ✓ 可以基于知识库准确回答问题");
+  // console.log("   ✓ 支持 RAG + 工具调用的混合使用");
+  // console.log("   ✓ 对知识库外的问题也能合理回答");
 }
 
+const res:any = [];
 // 运行主函数（交互模式）
 // 如果想运行演示模式，可以将 main() 改为 demo()
-demo().catch(console.error);
+for (let i = 0; i < 10; i++) {
+
+   await demo();
+
+}
+// demo().catch(console.error);
 
 // 导出供其他模块使用
 export { main, demo };

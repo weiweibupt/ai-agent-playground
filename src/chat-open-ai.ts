@@ -34,7 +34,7 @@ export class ChatOpenAI {
       project: process.env.OPENAI_PROJECT_ID,
       ...rest,
     });
-    console.log(`[ChatOpenAI] 1 [constructor] new OpenAI`);
+    //console.log(`[ChatOpenAI] 1 [constructor] new OpenAI`);
     this.model = model ?? "gpt-4o-mini";
     if (systemPrompt) {
       this.messages.push({ role: "system", content: systemPrompt });
@@ -61,11 +61,11 @@ export class ChatOpenAI {
       stream: true,
       ...(this.tools.length > 0 && { tools: this.tools }),
     } as const;
-    console.log(`[ChatOpenAI] [chat] 1 llm.chat messages+tools+model:::`);
+    //console.log(`[ChatOpenAI] [chat] 1 llm.chat messages+tools+model:::`);
     const stream = await this.llm.chat.completions.create(params);
 
 
-    console.log(`[ChatOpenAI] [chat] 2 llm返回stream`);
+    //console.log(`[ChatOpenAI] [chat] 2 llm返回stream`);
     let content = "";
     // 流式 tool_calls 累积器：index 为下标，同一 tool call 的数据分多块到达需按 index 合并
     const toolCallsAccumulator: Array<
@@ -73,7 +73,7 @@ export class ChatOpenAI {
     > = [];
 
     for await (const chunk of stream) {
-      // console.log("******************chunk***********");
+      // //console.log("******************chunk***********");
       const delta = chunk.choices[0]?.delta;
 
       if (delta?.content) {
@@ -125,10 +125,10 @@ export class ChatOpenAI {
           }
         : { role: "assistant", content };
 
-        console.log("[ChatOpenAI] [chat] 3  合并chunk到一条message::",message);
+        //console.log("[ChatOpenAI] [chat] 3  合并chunk到一条message::",message);
     // 将完整 assistant 消息（含 tool_calls）加入上下文，供后续 chat() 和 appendToolResult 使用
     this.messages.push(message);
-    console.log(`[ChatOpenAI] [chat] 4 维护上下文 messages.push:::${this.messages.length}`);
+    //console.log(`[ChatOpenAI] [chat] 4 维护上下文 messages.push:::${this.messages.length}`);
     return message;
   }
 
@@ -143,7 +143,7 @@ export class ChatOpenAI {
       tool_call_id: toolCallId,
       content: toolOutput,
     });
-    console.log(`[ChatOpenAI] [appendToolResult] 维护上下文 messages.push:::${this.messages.length}`);
+    //console.log(`[ChatOpenAI] [appendToolResult] 维护上下文 messages.push:::${this.messages.length}`);
   }
 
   /** 获取当前对话消息列表（只读） */
